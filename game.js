@@ -113,3 +113,11 @@ function punishment() {
 
   document.documentElement.requestFullscreen();
 }
+
+const LIMIT = 60 * 60 * 1000; // 1시간
+let startTime = localStorage.getItem("startTime");
+
+if (!startTime) {
+  startTime = Date.now();
+  localStorage.setItem("startTime", startTime);
+}
