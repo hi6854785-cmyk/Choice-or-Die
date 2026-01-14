@@ -65,3 +65,29 @@ document.addEventListener("mousemove", (e) => {
     }
 });
 </script>
+
+<script>
+const bg = document.getElementById("bg");
+const scream = document.getElementById("scream");
+const startBtn = document.getElementById("startBtn");
+
+startBtn.addEventListener("click", () => {
+  bg.volume = 0.4;
+  bg.muted = false;
+  bg.play();          // 🔓 여기서 오디오 권한 언락됨
+  startBtn.style.display = "none";
+});
+
+// ❌ 잘못된 선택
+function wrongChoice() {
+  scream.currentTime = 0;
+  scream.volume = 1;
+  scream.play();
+}
+
+// ❌ 경고 2회째
+function finalWarning() {
+  scream.currentTime = 0;
+  scream.play();
+}
+</script>
