@@ -183,3 +183,38 @@ function punishment() {
     document.documentElement.requestFullscreen();
   }, 800);
 }
+
+function checkAnswer(choice) {
+  if (choice === questions[current].answer) {
+    current++;
+    saveProgress();
+    showQuestion();
+  } else {
+    lost();
+  }
+}
+
+function lost() {
+  alert("You lost. Try again.");
+
+  jumpscare();
+
+  setTimeout(() => {
+    showQuestion(); // 같은 질문 다시
+  }, 600);
+}
+
+
+function jumpscare() {
+  const img = document.getElementById("scare");
+  const sound = document.getElementById("scareSound");
+
+  img.style.display = "block";
+  sound.currentTime = 0;
+  sound.play();
+
+  setTimeout(() => {
+    img.style.display = "none";
+  }, 400);
+}
+
