@@ -17,3 +17,16 @@ function jumpScare() {
     showQuestion(); // 실패 지점부터 재개
   }, 400);
 }
+
+function saveProgress() {
+  localStorage.setItem("progress", current);
+}
+
+
+const saved = localStorage.getItem("progress");
+if (saved !== null) {
+  current = parseInt(saved);
+}
+showQuestion();
+
+
