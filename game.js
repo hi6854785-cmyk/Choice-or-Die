@@ -51,3 +51,25 @@ function jumpScare() {
 }
 
 showQuestion();
+
+
+
+const LIMIT = 60 * 60 * 1000; // 1시간
+
+let startTime = localStorage.getItem("startTime");
+
+if (!startTime) {
+  startTime = Date.now();
+  localStorage.setItem("startTime", startTime);
+}
+
+function checkTime() {
+  const now = Date.now();
+  if (now - startTime > LIMIT) {
+    timeOver();
+  }
+}
+
+function timeOver() {
+  document.body.innerHTML = "<h1 style='color:red'>시간 초과</h1>";
+}
