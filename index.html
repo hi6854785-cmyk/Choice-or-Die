@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>선택하거나 죽음</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Choice or Die</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <div id="question"></div>
-  <div id="choices"></div>
+  <div id="timer">남은 시간: 60:00</div>
 
-  <img id="scare" src="scare.png" style="display:none;">
+  <div id="game">
+    <div id="question"></div>
+    <div id="choices"></div>
+  </div>
+
+  <img id="scare" src="scare.png" />
 
   <audio id="bgm" src="bgm.mp3" loop></audio>
   <audio id="scareSound" src="scare.mp3"></audio>
@@ -19,8 +23,3 @@
   <script src="game.js"></script>
 </body>
 </html>
-
-
-<div id="timer"></div>
-
-<audio id="scareSound" src="자산/scare.mp3"></audio>
