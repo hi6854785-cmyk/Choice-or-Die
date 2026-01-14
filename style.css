@@ -1,1 +1,16 @@
+body {
+  background: black;
+  color: #d0d0d0;
+  font-family: serif;
+}
+
+button {
+  background: #111;
+  color: #ccc;
+  border: 1px solid #333;
+}
+
+button:hover {
+  background: darkred;
+}
 
