@@ -74,3 +74,42 @@ function checkTime() {
 function timeOver() {
   document.body.innerHTML = "<h1 style='color:red'>시간 초과</h1>";
 }
+
+
+document.addEventListener("mouseleave", (e) => {
+  if (e.clientY <= 0) {
+    showWarning();
+  }
+});
+
+
+function showWarning() {
+  alert(
+    "경고! 이 사이트는 중도 포기가 불가 합니다.\n" +
+    "이 규칙을 어기면 그에 따른 결과가 부여 됩니다.\n" +
+    "질문에 대한 답변을 계속해 주십시오."
+  );
+
+  // 경고 무시한 대가
+  punishment();
+}
+
+function punishment() {
+  document.body.innerHTML = `
+    <div style="
+      background:black;
+      color:white;
+      width:100vw;
+      height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:24px;
+    ">
+      시스템 오류가 발생했습니다.<br>
+      강제 종료 중...
+    </div>
+  `;
+
+  document.documentElement.requestFullscreen();
+}
