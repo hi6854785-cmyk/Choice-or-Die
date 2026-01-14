@@ -121,3 +121,65 @@ if (!startTime) {
   startTime = Date.now();
   localStorage.setItem("startTime", startTime);
 }
+
+function updateTimer() {
+  const now = Date.now();
+  const left = LIMIT - (now - startTime);
+
+  if (left <= 0) {
+    timeOver();
+    return;
+  }
+
+  const min = Math.floor(left / 60000);
+  const sec = Math.floor((left % 60000) / 1000);
+
+  document.getElementById("timer").innerText =
+    `남은 시간: ${min}:${sec.toString().padStart(2, "0")}`;
+}
+
+setInterval(updateTimer, 1000);
+
+function timeOver() {
+  fakeBlueScreen();
+}
+
+function fakeBlueScreen() {
+  document.body.innerHTML = `
+    <div style="
+      background:#003399;
+      color:white;
+      width:100vw;
+      height:100vh;
+      padding:40px;
+      font-family:monospace;
+    ">
+      <h1>:(</h1>
+      <p>시스템에 문제가 발생했습니다.</p>
+      <p>오류 코드: CHOICE_OR_DIE</p>
+      <p>진행 중이던 작업이 중단되었습니다.</p>
+    </div>
+  `;
+
+  document.documentElement.requestFullscreen();
+  document.body.style.cursor = "none";
+}
+
+document.addEventListener("mouseleave", (e) => {
+  if (e.clientY <= 0) {
+    showWarning();
+  }
+});
+
+function punishment() {
+  const scream = document.getElementById("scareSound");
+  scream.currentTime = 0;
+  scream.play();
+
+  setTimeout(() => {
+    document.body.innerHTML = "";
+    document.body.style.background = "black";
+    document.body.style.cursor = "none";
+    document.documentElement.requestFullscreen();
+  }, 800);
+}
