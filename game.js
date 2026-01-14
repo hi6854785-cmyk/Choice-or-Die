@@ -30,3 +30,13 @@ if (saved !== null) {
 showQuestion();
 
 
+document.body.addEventListener("click", () => {
+  document.getElementById("bgm").play();
+}, { once: true });
+
+
+
+function jumpScare() {
+  document.getElementById("scareSound").play();
+  // 이미지 표시 로직
+}
