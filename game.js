@@ -50,6 +50,7 @@ function jumpScare() {
   }, 500);
 }
 
+checkTime();
 showQuestion();
 
 
