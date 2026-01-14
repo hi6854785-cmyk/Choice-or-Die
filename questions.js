@@ -11,21 +11,3 @@ const questions = [
   }
   // … 이런 식으로 100개
 ];
-
-
-let current = 0;
-
-function showQuestion() {
-  document.getElementById("question").innerText =
-    questions[current].q;
-
-  const choices = document.getElementById("choices");
-  choices.innerHTML = "";
-
-  questions[current].options.forEach((opt, i) => {
-    const btn = document.createElement("button");
-    btn.innerText = opt;
-    btn.onclick = () => checkAnswer(i);
-    choices.appendChild(btn);
-  });
-}
