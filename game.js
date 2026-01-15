@@ -1,33 +1,33 @@
 let warningCount = 0;
 let audioUnlocked = false;
+let gameStarted = false;
 
-// 오디오
 const bg = document.getElementById("bgSound");
 const scream = document.getElementById("screamSound");
-
-// 버튼
 const startBtn = document.getElementById("startBtn");
 
-// 배경음 기본 설정
 bg.volume = 0.35;
 bg.loop = true;
 
 // =====================
-// 🔓 START 클릭 → 오디오 권한 해제
+// ▶ START 버튼
 // =====================
 startBtn.addEventListener("click", () => {
-  if (audioUnlocked) return;
+  if (gameStarted) return;
 
-  // 배경음 재생 (이게 핵심)
-  bg.play().catch(() => {});
+  // 🔓 오디오 권한 해제
+  bg.play().then(() => {
+    bg.muted = false;
+  }).catch(() => {});
 
-  // 비명음도 한번 재생했다가 바로 멈춤 (권한 언락용)
   scream.play().then(() => {
     scream.pause();
     scream.currentTime = 0;
   }).catch(() => {});
 
   audioUnlocked = true;
+  gameStarted = true;
+
   startBtn.style.display = "none";
 });
 
@@ -42,15 +42,15 @@ function wrongChoice() {
   scream.play();
 
   setTimeout(() => {
-    alert("You lost. Try again.");
+    alert("You lost.");
   }, 300);
 }
 
 // =====================
-// ⚠️ 경고 처리
+// ⚠️ 경고
 // =====================
 function showWarning() {
-  if (!audioUnlocked) return;
+  if (!gameStarted) return;
 
   warningCount++;
 
@@ -69,7 +69,7 @@ function showWarning() {
 }
 
 // =====================
-// 💀 가짜 블루스크린
+// 💀 BSOD
 // =====================
 function triggerBSOD() {
   scream.currentTime = 0;
@@ -87,7 +87,7 @@ function triggerBSOD() {
 // 🖱️ 나가기 시도 감지
 // =====================
 document.addEventListener("mousemove", (e) => {
-  if (!audioUnlocked) return;
+  if (!gameStarted) return;
 
   if (
     e.clientY < 10 ||
