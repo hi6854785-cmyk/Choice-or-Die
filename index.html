@@ -5,90 +5,72 @@
 <title>Choice</title>
 
 <style>
-  body {
-    margin: 0;
-    background: black;
-    color: white;
-    font-family: Arial, sans-serif;
-    overflow: hidden;
-  }
+body {
+  margin: 0;
+  background: black;
+  color: white;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+}
 
-  button {
-    width: 100%;
-    padding: 15px;
-    margin: 10px 0;
-    background: #111;
-    color: white;
-    border: 1px solid #444;
-    cursor: pointer;
-    font-size: 16px;
-  }
+button {
+  width: 100%;
+  padding: 15px;
+  margin: 10px 0;
+  background: #111;
+  color: white;
+  border: 1px solid #444;
+  cursor: pointer;
+  font-size: 16px;
+}
 
-  button:hover {
-    background: #222;
-  }
+button:hover {
+  background: #222;
+}
 
-  /index.html
-/No_Way_Out.mp3
-/scream.mp3
+#startScreen, #gameScreen, #bsod, #blackout, #warning {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
 
-  <audio id="bgSound" src="No_Way_Out.mp3" loop></audio>
+#startScreen {
+  display: flex;
+}
 
-  #startScreen, #gameScreen, #bsod, #blackout, #warning {
-    position: fixed;
-    inset: 0;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-  }
+#warning {
+  background: rgba(0,0,0,0.95);
+  color: red;
+  font-size: 18px;
+  text-align: center;
+}
 
-  #startScreen {
-    display: flex;
-  }
+#bsod {
+  background: #0000aa;
+  color: white;
+  font-size: 20px;
+  padding: 40px;
+}
 
-  #introText {
-    margin-bottom: 40px;
-    text-align: center;
-    line-height: 1.6;
-  }
-
-  #gameScreen {
-    padding: 40px;
-  }
-
-  #warning {
-    background: rgba(0,0,0,0.9);
-    color: red;
-    font-size: 18px;
-    text-align: center;
-  }
-
-  #bsod {
-    background: #0000aa;
-    color: white;
-    font-size: 20px;
-    padding: 40px;
-  }
-
-  #blackout {
-    background: black;
-  }
+#blackout {
+  background: black;
+}
 </style>
 </head>
 
 <body>
 
-<!-- 시작 화면 -->
 <div id="startScreen">
-  <div id="introText">
+  <div>
     당신은 이미 선택했습니다.<br>
     지금 나가면 돌아갈 수 없습니다.
   </div>
   <button id="startBtn">시작</button>
 </div>
 
-<!-- 게임 화면 -->
 <div id="gameScreen">
   <h2>질문 1</h2>
   <p>계속 진행하시겠습니까?</p>
@@ -99,69 +81,60 @@
   <button onclick="wrongChoice()">D. 나간다</button>
 </div>
 
-<!-- 경고 -->
 <div id="warning">
-  ⚠ 경고!<br><br>
-  이 사이트는 중도 포기가 불가합니다.<br>
-  규칙을 어기면 그에 따른 결과가 부여됩니다.
+⚠ 경고!<br><br>
+이 사이트는 중도 포기가 불가합니다.<br>
+규칙을 어기면 결과가 부여됩니다.
 </div>
 
-<!-- 가짜 블루스크린 -->
 <div id="bsod">
-  문제가 발생하여 PC가 종료됩니다.<br><br>
-  오류 코드: STOP 0x000000F4
+문제가 발생하여 PC가 종료됩니다.<br><br>
+STOP 0x000000F4
 </div>
 
 <div id="blackout"></div>
 
 <!-- 사운드 -->
-<audio id="bgSound" src="No_Way_Out.mp3" loop></audio>
-<audio id="screamSound" src="scream.mp3"></audio>
+<audio id="bgSound" src="./No_Way_Out.mp3" loop></audio>
+<audio id="screamSound" src="./scream.mp3"></audio>
 
 <script>
 let started = false;
 let warningCount = 0;
 
-const startBtn = document.getElementById("startBtn");
-const startScreen = document.getElementById("startScreen");
-const gameScreen = document.getElementById("gameScreen");
 const bg = document.getElementById("bgSound");
 const scream = document.getElementById("screamSound");
 
-bg.volume = 0.35;
+bg.volume = 0.4;
 
-startBtn.addEventListener("click", () => {
+document.getElementById("startBtn").onclick = () => {
   if (started) return;
 
-  startScreen.style.display = "none";
-  gameScreen.style.display = "block";
+  document.getElementById("startScreen").style.display = "none";
+  document.getElementById("gameScreen").style.display = "block";
 
-  // 🔓 오디오 권한 해제
   bg.play();
+
+  // 비명 사전 활성화
   scream.play();
   scream.pause();
   scream.currentTime = 0;
 
   started = true;
-});
+};
 
 function wrongChoice() {
   scream.currentTime = 0;
   scream.play();
-
-  setTimeout(() => {
-    alert("You lost. Try again.");
-  }, 300);
+  setTimeout(() => alert("You lost. Try again."), 300);
 }
 
 function showWarning() {
   warningCount++;
 
   if (warningCount === 1) {
-    document.getElementById("warning").style.display = "flex";
-    setTimeout(() => {
-      document.getElementById("warning").style.display = "none";
-    }, 2500);
+    warning.style.display = "flex";
+    setTimeout(() => warning.style.display = "none", 2500);
   }
 
   if (warningCount === 2) {
@@ -174,15 +147,12 @@ function triggerBSOD() {
   scream.play();
 
   document.body.style.cursor = "none";
-  document.getElementById("bsod").style.display = "flex";
+  bsod.style.display = "flex";
 
-  setTimeout(() => {
-    document.getElementById("blackout").style.display = "block";
-  }, 2500);
+  setTimeout(() => blackout.style.display = "block", 2500);
 }
 
-// ❗ 나가기 감지 (상단 / 우측)
-document.addEventListener("mousemove", (e) => {
+document.addEventListener("mousemove", e => {
   if (!started) return;
   if (e.clientY < 10 || e.clientX > window.innerWidth - 10) {
     showWarning();
