@@ -1,33 +1,31 @@
 let warningCount = 0;
-let audioUnlocked = false;
 let gameStarted = false;
 
 const bg = document.getElementById("bgSound");
 const scream = document.getElementById("screamSound");
 const startBtn = document.getElementById("startBtn");
 
-bg.volume = 0.35;
+// =====================
+// 초기 오디오 설정
+// =====================
 bg.loop = true;
+bg.volume = 0.35;
+bg.muted = true;
+
+scream.volume = 1;
 
 // =====================
-// ▶ START 버튼
+// ▶ START 버튼 (오디오 언락 핵심)
 // =====================
 startBtn.addEventListener("click", () => {
   if (gameStarted) return;
 
-  // 🔓 오디오 권한 해제
-  bg.play().then(() => {
-    bg.muted = false;
-  }).catch(() => {});
+  // 🔓 브라우저 오디오 언락 (이게 핵심)
+  bg.muted = false;
+  bg.currentTime = 0;
+  bg.play(); // ← 반드시 클릭 이벤트 안에서 직접 실행
 
-  scream.play().then(() => {
-    scream.pause();
-    scream.currentTime = 0;
-  }).catch(() => {});
-
-  audioUnlocked = true;
   gameStarted = true;
-
   startBtn.style.display = "none";
 });
 
@@ -35,19 +33,19 @@ startBtn.addEventListener("click", () => {
 // ❌ 잘못된 선택
 // =====================
 function wrongChoice() {
-  if (!audioUnlocked) return;
+  if (!gameStarted) return;
 
+  scream.pause();
   scream.currentTime = 0;
-  scream.volume = 1;
   scream.play();
 
   setTimeout(() => {
-    alert("You lost.");
+    alert("You lost. Try again.");
   }, 300);
 }
 
 // =====================
-// ⚠️ 경고
+// ⚠️ 경고 처리
 // =====================
 function showWarning() {
   if (!gameStarted) return;
@@ -69,9 +67,10 @@ function showWarning() {
 }
 
 // =====================
-// 💀 BSOD
+// 💀 가짜 BSOD
 // =====================
 function triggerBSOD() {
+  scream.pause();
   scream.currentTime = 0;
   scream.play();
 
