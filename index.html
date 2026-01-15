@@ -2,165 +2,188 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>TEST</title>
+<title>Choice</title>
+
 <style>
-    body {
-        margin: 0;
-        background: black;
-        color: #e0e0e0;
-        font-family: Arial, sans-serif;
-        overflow: hidden;
-        cursor: default;
-    }
+  body {
+    margin: 0;
+    background: black;
+    color: white;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+  }
 
-    #container {
-        padding: 40px;
-        max-width: 800px;
-        margin: auto;
-    }
+  button {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    background: #111;
+    color: white;
+    border: 1px solid #444;
+    cursor: pointer;
+    font-size: 16px;
+  }
 
-    button {
-        display: block;
-        width: 100%;
-        margin: 10px 0;
-        padding: 15px;
-        background: #111;
-        color: #fff;
-        border: 1px solid #444;
-        font-size: 16px;
-        cursor: pointer;
-    }
+  button:hover {
+    background: #222;
+  }
 
-    button:hover {
-        background: #222;
-    }
+  #startScreen, #gameScreen, #bsod, #blackout, #warning {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
 
-    #warning {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.9);
-        color: red;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        font-size: 20px;
-        z-index: 9999;
-    }
+  #startScreen {
+    display: flex;
+  }
 
-    #bsod {
-        position: fixed;
-        inset: 0;
-        background: #0011aa;
-        color: white;
-        display: none;
-        padding: 40px;
-        font-family: monospace;
-        z-index: 10000;
-    }
+  #introText {
+    margin-bottom: 40px;
+    text-align: center;
+    line-height: 1.6;
+  }
 
-    #blackout {
-        position: fixed;
-        inset: 0;
-        background: black;
-        display: none;
-        z-index: 10001;
-    }
+  #gameScreen {
+    padding: 40px;
+  }
+
+  #warning {
+    background: rgba(0,0,0,0.9);
+    color: red;
+    font-size: 18px;
+    text-align: center;
+  }
+
+  #bsod {
+    background: #0000aa;
+    color: white;
+    font-size: 20px;
+    padding: 40px;
+  }
+
+  #blackout {
+    background: black;
+  }
 </style>
 </head>
+
 <body>
 
-<audio id="bgSound" src="bg.mp3" loop></audio>
-<audio id="screamSound" src="scream.mp3"></audio>
-
-<div id="container">
-    <h2>질문 1</h2>
-    <p>계속 진행하시겠습니까?</p>
-    <button onclick="wrong()">A. 아니오</button>
-    <button onclick="correct()">B. 예</button>
-    <button onclick="wrong()">C. 모르겠다</button>
-    <button onclick="wrong()">D. 나간다</button>
+<!-- 시작 화면 -->
+<div id="startScreen">
+  <div id="introText">
+    당신은 이미 선택했습니다.<br>
+    지금 나가면 돌아갈 수 없습니다.
+  </div>
+  <button id="startBtn">시작</button>
 </div>
 
+<!-- 게임 화면 -->
+<div id="gameScreen">
+  <h2>질문 1</h2>
+  <p>계속 진행하시겠습니까?</p>
+
+  <button onclick="wrongChoice()">A. 아니오</button>
+  <button>B. 예</button>
+  <button onclick="wrongChoice()">C. 모르겠다</button>
+  <button onclick="wrongChoice()">D. 나간다</button>
+</div>
+
+<!-- 경고 -->
 <div id="warning">
-    <div>
-        ⚠️ 경고!<br><br>
-        이 사이트는 중도 포기가 불가합니다.<br>
-        이 규칙을 어기면 그에 따른 결과가 부여됩니다.<br>
-        질문에 대한 답변을 계속하십시오.
-    </div>
+  ⚠ 경고!<br><br>
+  이 사이트는 중도 포기가 불가합니다.<br>
+  규칙을 어기면 그에 따른 결과가 부여됩니다.
 </div>
 
+<!-- 가짜 블루스크린 -->
 <div id="bsod">
-    :( <br><br>
-    Your PC ran into a problem and needs to restart.<br>
-    We're just collecting some error info...<br><br>
-    STOP CODE: IRREVERSIBLE_DECISION
+  문제가 발생하여 PC가 종료됩니다.<br><br>
+  오류 코드: STOP 0x000000F4
 </div>
 
 <div id="blackout"></div>
 
+<!-- 사운드 -->
+<audio id="bgSound" src="No_Way_Out.mp3" loop></audio>
+<audio id="screamSound" src="scream.mp3"></audio>
+
 <script>
+let started = false;
 let warningCount = 0;
 
+const startBtn = document.getElementById("startBtn");
+const startScreen = document.getElementById("startScreen");
+const gameScreen = document.getElementById("gameScreen");
 const bg = document.getElementById("bgSound");
 const scream = document.getElementById("screamSound");
 
-bg.volume = 0.3;
-bg.play().catch(()=>{});
+bg.volume = 0.35;
 
-function wrong() {
-    scream.currentTime = 0;
-    scream.play();
+startBtn.addEventListener("click", () => {
+  if (started) return;
+
+  startScreen.style.display = "none";
+  gameScreen.style.display = "block";
+
+  // 🔓 오디오 권한 해제
+  bg.play();
+  scream.play();
+  scream.pause();
+  scream.currentTime = 0;
+
+  started = true;
+});
+
+function wrongChoice() {
+  scream.currentTime = 0;
+  scream.play();
+
+  setTimeout(() => {
     alert("You lost. Try again.");
-}
-
-function correct() {
-    alert("다음 질문으로 진행 (샘플)");
+  }, 300);
 }
 
 function showWarning() {
-    warningCount++;
+  warningCount++;
 
-    if (warningCount === 1) {
-        document.getElementById("warning").style.display = "flex";
-        setTimeout(() => {
-            document.getElementById("warning").style.display = "none";
-        }, 3000);
-    }
+  if (warningCount === 1) {
+    document.getElementById("warning").style.display = "flex";
+    setTimeout(() => {
+      document.getElementById("warning").style.display = "none";
+    }, 2500);
+  }
 
-    if (warningCount >= 2) {
-        triggerBSOD();
-    }
+  if (warningCount === 2) {
+    triggerBSOD();
+  }
 }
 
 function triggerBSOD() {
-    scream.currentTime = 0;
-    scream.play();
+  scream.currentTime = 0;
+  scream.play();
 
-    document.body.style.cursor = "none";
-    document.getElementById("bsod").style.display = "block";
+  document.body.style.cursor = "none";
+  document.getElementById("bsod").style.display = "flex";
 
-    setTimeout(() => {
-        document.getElementById("blackout").style.display = "block";
-    }, 2500);
+  setTimeout(() => {
+    document.getElementById("blackout").style.display = "block";
+  }, 2500);
 }
 
-// 창 상단 / 닫기 근처 감지
+// ❗ 나가기 감지 (상단 / 우측)
 document.addEventListener("mousemove", (e) => {
-    if (e.clientY < 10 || e.clientX > window.innerWidth - 10) {
-        showWarning();
-    }
+  if (!started) return;
+  if (e.clientY < 10 || e.clientX > window.innerWidth - 10) {
+    showWarning();
+  }
 });
 </script>
 
 </body>
 </html>
 
-<button id="startBtn">시작</button>
-
-<audio id="bg" src="bg.wav" loop></audio>
-<audio id="scream" src="scream.wav"></audio>
-
-<audio id="bgSound" src="No_Way_Out.mp3"></audio>
-<audio id="screamSound" src="scream.mp3"></audio>
