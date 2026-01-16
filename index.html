@@ -3,127 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <title>Choice or Die</title>
-
 <style>
-body {
-  margin: 0;
-  background: black;
-  color: white;
-  font-family: Arial, sans-serif;
-  overflow: hidden;
-}
-
-button {
-  width: 100%;
-  padding: 15px;
-  margin-top: 20px;
-  background: #111;
-  color: white;
-  border: 1px solid #444;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-.screen {
-  position: fixed;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
-
-#startScreen { display: flex; }
-#warning { background: rgba(0,0,0,0.95); color: red; }
-#bsod { background: #0000aa; }
-#blackout { background: black; }
+body { margin:0; background:black; color:white; text-align:center; }
+button { padding:15px; font-size:18px; margin-top:20px; width:90%; }
 </style>
 </head>
 
 <body>
 
-<div id="startScreen" class="screen">
-  <div>
-    당신은 이미 선택했습니다.<br><br>
-    지금 나가면 돌아갈 수 없습니다.
-  </div>
-  <button id="startBtn">시작</button>
-</div>
-
-<div id="gameScreen" class="screen">
-  <h2>질문 1</h2>
-  <p>계속 진행하시겠습니까?</p>
-  <button onclick="wrongChoice()">A. 아니오</button>
-  <button>B. 예</button>
-  <button onclick="wrongChoice()">C. 모르겠다</button>
-  <button onclick="wrongChoice()">D. 나간다</button>
-</div>
-
-<div id="warning" class="screen">
-⚠ 경고 ⚠<br><br>중도 포기는 허용되지 않습니다.
-</div>
-
-<div id="bsod" class="screen">
-문제가 발생하여 PC가 종료됩니다.<br><br>STOP 0x000000F4
-</div>
-
-<div id="blackout" class="screen"></div>
-
-<audio id="bg" src="bg.mp3" preload="auto"></audio>
-<audio id="scream" src="scream.mp3" preload="auto"></audio>
+<h2>당신은 이미 선택했습니다</h2>
+<button id="startBtn">시작</button>
 
 <script>
-let started = false;
-let warningCount = 0;
+let audioCtx;
+let bgSource;
+let screamBuffer;
 
-const bg = document.getElementById("bg");
-const scream = document.getElementById("scream");
+async function loadSound(url) {
+  const res = await fetch(url);
+  const data = await res.arrayBuffer();
+  return await audioCtx.decodeAudioData(data);
+}
 
-bg.volume = 0.5;
-bg.loop = true;
+document.getElementById("startBtn").onclick = async () => {
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-document.getElementById("startBtn").onclick = () => {
-  if (started) return;
+  const bgBuffer = await loadSound("bg.mp3");
+  screamBuffer = await loadSound("scream.mp3");
 
-  bg.muted = false;
-  bg.play();           // 🔴 여기서 반드시 소리 남
-  started = true;
+  bgSource = audioCtx.createBufferSource();
+  bgSource.buffer = bgBuffer;
+  bgSource.loop = true;
 
-  document.getElementById("startScreen").style.display = "none";
-  document.getElementById("gameScreen").style.display = "flex";
+  const gain = audioCtx.createGain();
+  gain.gain.value = 0.6;
+
+  bgSource.connect(gain).connect(audioCtx.destination);
+  bgSource.start(0);
+
+  document.body.innerHTML = "<h1>질문 1</h1><button onclick='scream()'>잘못된 선택</button>";
 };
 
-function wrongChoice() {
-  scream.currentTime = 0;
-  scream.play();
-  setTimeout(() => alert("You lost. Try again."), 300);
+function scream() {
+  const src = audioCtx.createBufferSource();
+  src.buffer = screamBuffer;
+  src.connect(audioCtx.destination);
+  src.start();
 }
-
-function showWarning() {
-  warningCount++;
-
-  if (warningCount === 1) {
-    warning.style.display = "flex";
-    setTimeout(() => warning.style.display = "none", 2500);
-  }
-
-  if (warningCount === 2) triggerBSOD();
-}
-
-function triggerBSOD() {
-  scream.currentTime = 0;
-  scream.play();
-  document.body.style.cursor = "none";
-  bsod.style.display = "flex";
-  setTimeout(() => blackout.style.display = "flex", 2500);
-}
-
-document.addEventListener("mousemove", e => {
-  if (!started) return;
-  if (e.clientY < 10 || e.clientX < 10 || e.clientX > innerWidth - 10)
-    showWarning();
-});
 </script>
 
 </body>
 </html>
+
