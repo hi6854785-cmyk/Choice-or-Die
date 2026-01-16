@@ -24,10 +24,6 @@ button {
   cursor: pointer;
 }
 
-button:hover {
-  background: #222;
-}
-
 .screen {
   position: fixed;
   inset: 0;
@@ -37,32 +33,15 @@ button:hover {
   flex-direction: column;
 }
 
-#startScreen {
-  display: flex;
-  text-align: center;
-}
-
-#warning {
-  background: rgba(0,0,0,0.95);
-  color: red;
-  font-size: 20px;
-}
-
-#bsod {
-  background: #0000aa;
-  color: white;
-  font-size: 22px;
-}
-
-#blackout {
-  background: black;
-}
+#startScreen { display: flex; }
+#warning { background: rgba(0,0,0,0.95); color: red; }
+#bsod { background: #0000aa; }
+#blackout { background: black; }
 </style>
 </head>
 
 <body>
 
-<!-- 시작 화면 -->
 <div id="startScreen" class="screen">
   <div>
     당신은 이미 선택했습니다.<br><br>
@@ -71,80 +50,55 @@ button:hover {
   <button id="startBtn">시작</button>
 </div>
 
-<!-- 게임 화면 -->
 <div id="gameScreen" class="screen">
   <h2>질문 1</h2>
   <p>계속 진행하시겠습니까?</p>
-
   <button onclick="wrongChoice()">A. 아니오</button>
   <button>B. 예</button>
   <button onclick="wrongChoice()">C. 모르겠다</button>
   <button onclick="wrongChoice()">D. 나간다</button>
 </div>
 
-<!-- 경고 -->
 <div id="warning" class="screen">
-⚠ 경고 ⚠<br><br>
-이 사이트는 중도 포기가 불가합니다.
+⚠ 경고 ⚠<br><br>중도 포기는 허용되지 않습니다.
 </div>
 
-<!-- BSOD -->
 <div id="bsod" class="screen">
-문제가 발생하여 PC가 종료됩니다.<br><br>
-STOP 0x000000F4
+문제가 발생하여 PC가 종료됩니다.<br><br>STOP 0x000000F4
 </div>
 
 <div id="blackout" class="screen"></div>
 
-<!-- 사운드 -->
-<audio id="bgSound" src="bg.wav" preload="auto"></audio>
-<audio id="screamSound" src="scream.wav" preload="auto"></audio>
+<audio id="bg" src="bg.mp3" preload="auto"></audio>
+<audio id="scream" src="scream.mp3" preload="auto"></audio>
 
 <script>
 let started = false;
 let warningCount = 0;
 
-const startBtn = document.getElementById("startBtn");
-const startScreen = document.getElementById("startScreen");
-const gameScreen = document.getElementById("gameScreen");
-const warning = document.getElementById("warning");
-const bsod = document.getElementById("bsod");
-const blackout = document.getElementById("blackout");
+const bg = document.getElementById("bg");
+const scream = document.getElementById("scream");
 
-const bg = document.getElementById("bgSound");
-const scream = document.getElementById("screamSound");
-
-bg.volume = 0.4;
+bg.volume = 0.5;
 bg.loop = true;
 
-// ▶ 시작 버튼
-startBtn.onclick = () => {
+document.getElementById("startBtn").onclick = () => {
   if (started) return;
 
-  // 오디오 권한 확보 (이게 핵심)
-  bg.play().then(() => {
-    console.log("BG OK");
-  }).catch(err => {
-    console.log("BG ERROR", err);
-  });
-
-  startScreen.style.display = "none";
-  gameScreen.style.display = "flex";
+  bg.muted = false;
+  bg.play();           // 🔴 여기서 반드시 소리 남
   started = true;
+
+  document.getElementById("startScreen").style.display = "none";
+  document.getElementById("gameScreen").style.display = "flex";
 };
 
-// ❌ 틀린 선택
 function wrongChoice() {
   scream.currentTime = 0;
-  scream.volume = 1;
   scream.play();
-
-  setTimeout(() => {
-    alert("You died.");
-  }, 300);
+  setTimeout(() => alert("You lost. Try again."), 300);
 }
 
-// ⚠ 경고
 function showWarning() {
   warningCount++;
 
@@ -153,38 +107,23 @@ function showWarning() {
     setTimeout(() => warning.style.display = "none", 2500);
   }
 
-  if (warningCount === 2) {
-    triggerBSOD();
-  }
+  if (warningCount === 2) triggerBSOD();
 }
 
-// 💀 BSOD
 function triggerBSOD() {
   scream.currentTime = 0;
   scream.play();
-
   document.body.style.cursor = "none";
   bsod.style.display = "flex";
-
-  setTimeout(() => {
-    blackout.style.display = "flex";
-  }, 2500);
+  setTimeout(() => blackout.style.display = "flex", 2500);
 }
 
-// 🖱️ 나가려는 행동 감지
 document.addEventListener("mousemove", e => {
   if (!started) return;
-
-  if (
-    e.clientY < 10 ||
-    e.clientX < 10 ||
-    e.clientX > window.innerWidth - 10
-  ) {
+  if (e.clientY < 10 || e.clientX < 10 || e.clientX > innerWidth - 10)
     showWarning();
-  }
 });
 </script>
 
 </body>
 </html>
-
