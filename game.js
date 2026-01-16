@@ -1,41 +1,39 @@
+let started = false;
 let warningCount = 0;
-let gameStarted = false;
 
 const bg = document.getElementById("bgSound");
 const scream = document.getElementById("screamSound");
-const startBtn = document.getElementById("startBtn");
 
-// =====================
-// 초기 오디오 설정
-// =====================
-bg.loop = true;
-bg.volume = 0.35;
-bg.muted = true;
-
+// 볼륨 확실히
+bg.volume = 1;
 scream.volume = 1;
 
 // =====================
-// ▶ START 버튼 (오디오 언락 핵심)
+// ▶ START 버튼
 // =====================
-startBtn.addEventListener("click", () => {
-  if (gameStarted) return;
+document.getElementById("startBtn").addEventListener("click", () => {
+  if (started) return;
 
-  // 🔓 브라우저 오디오 언락 (이게 핵심)
+  // 🔓 브라우저 오디오 잠금 해제 (핵심)
   bg.muted = false;
   bg.currentTime = 0;
-  bg.play(); // ← 반드시 클릭 이벤트 안에서 직접 실행
+  bg.play();
 
-  gameStarted = true;
-  startBtn.style.display = "none";
+  scream.muted = false;
+  scream.currentTime = 0;
+  scream.play();
+  scream.pause();
+
+  document.getElementById("startScreen").style.display = "none";
+  document.getElementById("gameScreen").style.display = "block";
+
+  started = true;
 });
 
 // =====================
 // ❌ 잘못된 선택
 // =====================
 function wrongChoice() {
-  if (!gameStarted) return;
-
-  scream.pause();
   scream.currentTime = 0;
   scream.play();
 
@@ -45,20 +43,16 @@ function wrongChoice() {
 }
 
 // =====================
-// ⚠️ 경고 처리
+// ⚠️ 경고 시스템
 // =====================
 function showWarning() {
-  if (!gameStarted) return;
+  if (!started) return;
 
   warningCount++;
 
   if (warningCount === 1) {
-    const w = document.getElementById("warning");
-    w.style.display = "flex";
-
-    setTimeout(() => {
-      w.style.display = "none";
-    }, 3000);
+    warning.style.display = "flex";
+    setTimeout(() => warning.style.display = "none", 2500);
   }
 
   if (warningCount === 2) {
@@ -67,32 +61,25 @@ function showWarning() {
 }
 
 // =====================
-// 💀 가짜 BSOD
+// 💀 BSOD
 // =====================
 function triggerBSOD() {
-  scream.pause();
   scream.currentTime = 0;
   scream.play();
 
   document.body.style.cursor = "none";
-  document.getElementById("bsod").style.display = "block";
+  bsod.style.display = "flex";
 
-  setTimeout(() => {
-    document.getElementById("blackout").style.display = "block";
-  }, 2500);
+  setTimeout(() => blackout.style.display = "block", 2500);
 }
 
 // =====================
 // 🖱️ 나가기 시도 감지
 // =====================
-document.addEventListener("mousemove", (e) => {
-  if (!gameStarted) return;
+document.addEventListener("mousemove", e => {
+  if (!started) return;
 
-  if (
-    e.clientY < 10 ||
-    e.clientX < 10 ||
-    e.clientX > window.innerWidth - 10
-  ) {
+  if (e.clientY < 10 || e.clientX < 10 || e.clientX > window.innerWidth - 10) {
     showWarning();
   }
 });
